@@ -1,0 +1,64 @@
+{% if items %}
+    {% for item in items %}
+    <div class="menu-item" data-type="{{ item.item_type }}" 
+         data-item-id="{{ item.orderable_id }}" 
+         data-name="{{ item.item_name }}"
+         data-price="{{ item.item_price }}"
+         data-image-url="{{ item.orderable_image_url }}"
+         data-orderable-type="item">
+        <div class="item-image">
+            {% if item.orderable_image_url %}
+            <img src="{{ item.orderable_image_url }}" alt="{{ item.orderable_image_name }}">
+            {% else %}
+                {% if item.item_type == "Starter" %}
+                    <i class="fa-solid fa-egg"></i>
+                {% elif item.item_type == "Main course" %}
+                    <i class="fa-solid fa-burger"></i>
+                {% elif item.item_type == "Dessert" %}
+                    <i class="fa-solid fa-cookie"></i>
+                {% elif item.item_type == "Drink" %}
+                    <i class="fa-solid fa-beer-mug-empty"></i>
+                {% elif item.item_type == "Side dish" %}
+                    <i class="fa-solid fa-bowl-rice"></i>
+                {% endif %}
+            {% endif %} 
+            
+            {% if item.item_stock > 50 %}
+                <span class="item-badge">Popular</span>
+            {% elif item.item_stock <= 50 and item.item_stock >= 5 %}
+                <span class="item-badge" style="background: linear-gradient(135deg, #feca57 0%, #ff9ff3 100%);">Low stock</span>
+            {% elif item.item_stock < 5 %}
+                <span class="item-badge" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">Last chance</span>
+            {% endif %}
+        </div>
+        <div class="item-content">
+            <div class="item-header">
+                <h3 class="item-name">{{ item.item_name }}</h3>
+                <span class="item-price">{{ "%.2f"|format(item.price) }}€</span>
+            </div>
+            <p class="item-description">
+                {{ item.item_description }}
+            </p>
+        
+            <p class="item-stock {% if item.item_stock <= 10 %}low{% endif %}">
+                En stock : {{ item.item_stock }} unité{{ "s" if item.item_stock > 1 else "" }}
+            </p>
+            <div class="item-actions">
+                <div class="quantity-selector">
+                    <button class="qty-btn" onclick="decreaseQty(this)">−</button>
+                    <span class="qty-display">1</span>
+                    <button class="qty-btn" onclick="increaseQty(this, {{ item.item_stock }})">+</button>
+                </div>
+                <button class="add-to-cart-btn" onclick="addToCart(this)">
+                    Add
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="empty-message" style="grid-column: 1 / -1;">
+        <div class="empty-message-icon">Menu vide</div>
+        <h3 style="color: #2c3e50; margin-bottom: 10px; font-size: 24px;">No items available</h3>
+    </div>
+{% endif %}

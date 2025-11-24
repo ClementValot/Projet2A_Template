@@ -12,6 +12,15 @@ dependencies = [
     "PyJWT>=2.10.1",
     "psycopg2-binary>=2.9.10",
     "python-dotenv>=1.1.1",
+    "googlemaps>=4.10.0",
+    "pyyaml>=6.0.3",
+    "phonenumbers>=9.0.17",
+    "python-multipart>=0.0.20",
+    "stripe>=13.1.1",
+    "py3-validate-email>=1.0.5.post2",
+    "jinja2>=3.1.6",
+    "faker>=37.12.0",
+    "email-validator>=2.3.0",
 ]
 requires-python = "==3.12.*"
 readme = "README.md"
@@ -35,9 +44,11 @@ format = "ruff format"
 test = "pytest tests --cov=src"
 start = "pdm run __main__.py"
 typecheck = "pyrefly check"
+resetscale = "pdm run python -m src.utils.reset_db project test"
+resetprod = "pdm run python -m src.utils.reset_db project test True"
 
 [tool.ruff]
-line-length = 120
+line-length = 100
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "B", "I", "A", "C90", "PERF", "TCH", "TID"]

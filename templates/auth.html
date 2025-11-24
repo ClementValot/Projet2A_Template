@@ -1,0 +1,462 @@
+{% extends "base.html" %}
+
+{% block title %}Login / Register - Ub'EJR Eats{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-container {
+        max-width: 520px;
+        margin: 50px auto;
+        padding: 40px;
+        background: #f8f9fa;
+        border-radius: 25px;
+        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.15);
+        animation: scaleIn 0.5s ease-out;
+        border: 1px solid rgba(102, 126, 234, 0.1);
+    }
+
+    @keyframes scaleIn {
+        from {
+            transform: scale(0.9);
+            opacity: 0;
+        }
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    .auth-tabs {
+        display: flex;
+        margin-bottom: 35px;
+        border-bottom: 2px solid #e9ecef;
+        position: relative;
+    }
+
+    .auth-tabs::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 50%;
+        height: 2px;
+        background:  #667eea;
+        transition: left 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .auth-tabs.register-active::after {
+        left: 50%;
+    }
+
+    .auth-tab {
+        flex: 1;
+        padding: 15px;
+        text-align: center;
+        cursor: pointer;
+        background: none;
+        border: none;
+        font-size: 18px;
+        font-weight: 600;
+        color: #95a5a6;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .auth-tab.active {
+        color: #667eea;
+    }
+
+    .auth-tab:hover:not(.active) {
+        color: #7f8ff4;
+        transform: translateY(-2px);
+    }
+
+    .auth-form {
+        display: none;
+        animation: fadeInUp 0.5s ease-out;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .auth-form.active {
+        display: block;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+        position: relative;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 14px;
+        transition: color 0.3s ease;
+    }
+
+    .form-group:focus-within label {
+        color: #667eea;
+    }
+
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 14px 18px;
+        border: 2px solid #e9ecef;
+        border-radius: 15px;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+        color: #2c3e50;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: #667eea;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .form-group input:hover,
+    .form-group select:hover {
+        border-color: #c5cae9;
+    }
+
+    .form-group small {
+        display: block;
+        margin-top: 8px;
+        color: #7f8c8d;
+        font-size: 13px;
+        padding-left: 5px;
+    }
+
+    .btn-submit {
+        width: 100%;
+        padding: 16px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        font-size: 17px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-submit::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+
+    .btn-submit:hover::before {
+        width: 400px;
+        height: 400px;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-submit:active {
+        transform: translateY(-1px);
+    }
+
+    .error-message {
+        color: #fa709a;
+        font-size: 13px;
+        margin-top: 8px;
+        padding-left: 5px;
+        animation: shake 0.5s ease;
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+
+    @keyframes slideInLeft {
+        from {
+            transform: translateX(-20px);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-tabs" id="auth-tabs">
+        <button class="auth-tab active" onclick="switchTab('login')">
+            Login
+        </button>
+        <button class="auth-tab" onclick="switchTab('register')">
+            Register
+        </button>
+    </div>
+
+    <form id="login-form" class="auth-form active" method="POST" action="/auth/login">
+        <div class="form-group">
+            <label for="login-user-type">I am :</label>
+            <select id="login-user-type" name="user_type" required>
+                <option value="customer">Customer</option>
+                <option value="driver">Driver</option>
+                <option value="admin">Admin</option>
+            </select>
+        </div>
+
+        <div class="form-group" id="login-identifier-group">
+            <label for="login-identifier">Email or phone :</label>
+            <input 
+                type="text" 
+                id="login-identifier" 
+                name="identifier" 
+                placeholder="example@email.com / 0612345678"
+                required
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="login-password">Password :</label>
+            <input 
+                type="password" 
+                id="login-password" 
+                name="password" 
+                placeholder="Your password"
+                required
+            >
+        </div>
+
+        <button type="submit" class="btn-submit">Login</button>
+    </form>
+
+    <form id="register-form" class="auth-form" method="POST" action="/auth/register">
+        <div class="form-group">
+            <label for="register-first-name">First Name :</label>
+            <input 
+                type="text" 
+                id="register-first-name" 
+                name="first_name" 
+                placeholder="John"
+                required
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="register-last-name">Last Name :</label>
+            <input 
+                type="text" 
+                id="register-last-name" 
+                name="last_name" 
+                placeholder="Smith"
+                required
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="register-phone">Phone :</label>
+            <input 
+                type="tel" 
+                id="register-phone" 
+                name="phone" 
+                placeholder="0612345678"
+                pattern="[0-9]{10}"
+                required
+            >
+            <small>Format: 10 chiffres sans espaces</small>
+        </div>
+
+        <div class="form-group">
+            <label for="register-email">Email :</label>
+            <input 
+                type="email" 
+                id="register-email" 
+                name="mail" 
+                placeholder="example@email.com"
+                required
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="register-password">Password :</label>
+            <input 
+                type="password" 
+                id="register-password" 
+                name="password" 
+                placeholder="Your password"
+                minlength="8"
+                required
+            >
+            <small>At least 6 character, an uppercase letter and a special character</small>
+        </div>
+
+        <div class="form-group">
+            <label for="register-confirm-password">Confirm password :</label>
+            <input 
+                type="password" 
+                id="register-confirm-password" 
+                name="confirm_password" 
+                placeholder="Confirm your password"
+                minlength="8"
+                required
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="register-address">Address :</label>
+            <input 
+                type="text" 
+                id="register-address" 
+                name="address_string" 
+                placeholder="12 Rue de la République, 35000 Rennes"
+                required
+            >
+        </div>
+
+        <button type="submit" class="btn-submit">S'inscrire</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function switchTab(tab) {
+        const tabs = document.querySelectorAll('.auth-tab');
+        const authTabsContainer = document.getElementById('auth-tabs');
+        tabs.forEach(t => t.classList.remove('active'));
+        
+        const forms = document.querySelectorAll('.auth-form');
+        forms.forEach(f => f.classList.remove('active'));
+        
+        if (tab === 'login') {
+            tabs[0].classList.add('active');
+            document.getElementById('login-form').classList.add('active');
+            authTabsContainer.classList.remove('register-active');
+        } else {
+            tabs[1].classList.add('active');
+            document.getElementById('register-form').classList.add('active');
+            authTabsContainer.classList.add('register-active');
+        }
+    }
+
+    document.getElementById('login-user-type').addEventListener('change', function(e) {
+        const identifierGroup = document.getElementById('login-identifier-group');
+        const identifierInput = document.getElementById('login-identifier');
+        const label = identifierGroup.querySelector('label');
+        
+        if (e.target.value === 'admin') {
+            identifierGroup.style.display = 'block';
+            identifierInput.required = true;
+            label.textContent = 'Username :';
+            identifierInput.placeholder = 'id';
+            identifierInput.type = 'text';
+        } else if (e.target.value === 'driver') {
+            identifierGroup.style.display = 'block';
+            identifierInput.required = true;
+            label.textContent = 'Phone :';
+            identifierInput.placeholder = '0612345678';
+            identifierInput.type = 'tel';
+        } else {
+            identifierGroup.style.display = 'block';
+            identifierInput.required = true;
+            label.textContent = 'EMail or phone :';
+            identifierInput.placeholder = 'example@email.com or 0612345678';
+            identifierInput.type = 'text';
+        }
+    });
+
+    document.getElementById('register-form').addEventListener('submit', function(e) {
+        const password = document.getElementById('register-password').value;
+        const confirmPassword = document.getElementById('register-confirm-password').value;
+    });
+
+    document.getElementById('login-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData);
+        
+        try {
+            const response = await fetch('/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                if (data.user_type === 'customer') {
+                    window.location.href = '/menu';
+                } else if (data.user_type === 'driver') {
+                    window.location.href = '/deliveries';
+                } else if (data.user_type === 'admin') {
+                    window.location.href = '/admin/docs';
+                }
+            } else {
+                const error = await response.json();
+                alert('Error: ' + (error.detail || 'Invalid credentials'));
+            }
+        } catch (error) {
+            alert('Error occured while login: ' + error.message);
+        }
+    });
+
+    document.getElementById('register-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData);
+        
+        try {
+            const response = await fetch('/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+            
+            if (response.ok) {
+                window.location.href = '/menu';
+            } else {
+                const error = await response.json();
+                alert('Error: ' + (error.detail));
+            }
+        } catch (error) {
+            alert('Erreur while registering : ' + error.message);
+        }
+    });
+</script>
+{% endblock %}

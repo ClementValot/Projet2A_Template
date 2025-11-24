@@ -1,0 +1,379 @@
+{% extends "base.html" %}
+
+{% block title %}Livraison en cours - Ub'EJR Eats{% endblock %}
+
+{% block extra_css %}
+<style>
+    .delivery-active-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+        height: calc(100vh - 80px);
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .delivery-header {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .delivery-title {
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .delivery-title h1 {
+        font-size: 28px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 5px;
+    }
+
+    .delivery-subtitle {
+        color: #7f8c8d;
+        font-size: 14px;
+    }
+
+    .delivery-status {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+        color: white;
+        border-radius: 20px;
+        font-weight: 700;
+        box-shadow: 0 4px 15px rgba(132, 250, 176, 0.3);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+    }
+
+    .end-delivery-btn {
+        padding: 14px 32px;
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        color: white;
+        border: none;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 6px 20px rgba(250, 112, 154, 0.3);
+    }
+
+    .end-delivery-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(250, 112, 154, 0.4);
+    }
+
+    .delivery-content {
+        display: grid;
+        grid-template-columns: 1fr 350px;
+        gap: 20px;
+        flex: 1;
+        min-height: 0;
+    }
+
+    .map-container {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border-radius: 20px;
+        padding: 10px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+
+    #map {
+        width: 100%;
+        height: 100%;
+        border-radius: 15px;
+        min-height: 400px;
+    }
+
+    .info-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        overflow-y: auto;
+    }
+
+    .info-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .info-card h3 {
+        font-size: 18px;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .info-card h3 i {
+        color: #667eea;
+    }
+
+    .address-box {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 12px;
+        border-left: 3px solid #667eea;
+    }
+
+    .address-text {
+        color: #2c3e50;
+        font-weight: 500;
+        line-height: 1.6;
+    }
+
+    .order-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px;
+        background: white;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .order-item:hover {
+        transform: translateX(5px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+    }
+
+    .item-info {
+        flex: 1;
+    }
+
+    .item-name {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 3px;
+    }
+
+    .item-quantity {
+        font-size: 13px;
+        color: #7f8c8d;
+    }
+
+    .total-box {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 12px;
+        color: white;
+        margin-top: 10px;
+    }
+
+    .total-label {
+        font-weight: 600;
+        font-size: 16px;
+    }
+
+    .total-amount {
+        font-size: 24px;
+        font-weight: 800;
+    }
+
+    .nav-actions {
+        display: grid;
+        gap: 10px;
+    }
+
+    .action-btn {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .btn-maps {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-maps:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-call {
+        background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(132, 250, 176, 0.3);
+    }
+
+    .btn-call:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(132, 250, 176, 0.4);
+    }
+
+    .loading-map {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: #7f8c8d;
+    }
+
+    .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid #e9ecef;
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="delivery-active-container">
+    <div class="delivery-header">
+        <div class="delivery-title">
+            <h1 id="order-title">Delivery #--</h1>
+        </div>
+        <button class="end-delivery-btn" onclick="endDelivery()">
+            <i class="fa-solid fa-check-circle"></i>
+            Finish delivery
+        </button>
+    </div>
+
+    <div class="delivery-content">
+        <div class="map-container">
+            <div id="map">
+                <div class="loading-map">
+                    <div class="loading-spinner"></div>
+                    <p>Loading map...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-panel">
+            <div class="info-card">
+                <h3>
+                    <i class="fa-solid fa-location-dot"></i>
+                    Delivery address
+                </h3>
+                <div class="address-box">
+                    <div class="address-text" id="delivery-address">{{ address }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% raw %}
+<script>
+    let currentOrderId = null;
+    let deliveryAddress = null;
+
+    document.addEventListener('DOMContentLoaded', async function() {
+        const pathParts = window.location.pathname.split('/');
+        currentOrderId = pathParts[pathParts.length - 1];
+        await loadMap(currentOrderId);
+    });
+
+    async function loadMap(currentOrderId) {
+        try {
+            const response = await fetch(`/drivers/orders/${currentOrderId}/path`, {
+                credentials: 'include'
+            });
+            if (response.ok) {
+                const data = await response.json();
+                const mapHtml = `
+                    <iframe
+                        width="100%"
+                        height="100%"
+                        style="border:0; border-radius: 15px;"
+                        loading="lazy"
+                        allowfullscreen
+                        referrerpolicy="no-referrer-when-downgrade"
+                        src="${data.url}">
+                    </iframe>
+                `;
+                
+                document.getElementById('map').innerHTML = mapHtml;
+                document.getElementById('delivery-address').innerHTML = data.address
+                document.getElementById('order-title').innerHTML = `Delivery # ${currentOrderId}`
+            }
+
+        } catch (error) {
+            console.error('Erreur:', error);
+        }
+    }
+
+    async function endDelivery() {
+        const btn = event.target;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Finalisation...';
+
+        try {
+            const response = await fetch(`/drivers/orders/${currentOrderId}/end`, {
+                method: 'PUT',
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                window.location.href = '/deliveries';
+            } else {
+                const error = await response.json();
+                alert('Error: ' + (error.detail || 'Error ending delivery'));
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-check-circle"></i> Fin';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error finishing delivery');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-check-circle"></i> Finish delivery';
+        }
+    }
+</script>
+{% endraw %}
+{% endblock %}

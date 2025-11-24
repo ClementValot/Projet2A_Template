@@ -1,0 +1,51 @@
+{% if bundles %}
+    {% for bundle in bundles %}
+    <div class="menu-item bundle-card" data-type="bundles" 
+         data-item-id="{{ bundle.orderable_id }}" 
+         data-name="{{ bundle.bundle_name }}"
+         data-price="{{ bundle.price }}"
+        data-image-url="{{ bundle.orderable_image_url }}"
+         data-orderable-type="bundle">
+        <div class="item-image">
+            {% if bundle.orderable_image_url %}
+                <img src="{{ bundle.orderable_image_url }}" alt="{{ bundle.orderable_image_name }}">
+            {% else %}
+                <i class="fa-solid fa-utensils"></i>
+            {% endif %}
+            <span class="item-badge">Save {{ bundle.bundle_reduction }}%</span>
+        </div>
+        <div class="item-content">
+            <div class="item-header">
+                <h3 class="item-name">{{ bundle.bundle_name }}</h3>
+                <span class="item-price">{{ "%.2f"|format(bundle.price) }}€</span>
+            </div>
+            <p class="item-description">
+                {{ bundle.bundle_description}}
+            </p>
+            <p class="item-stock {% if bundle.get_stock() <= 10 %}low{% endif %}">
+                En stock : {{ bundle.get_stock() }} unité{{ "s" if bundle.get_stock() > 1 else "" }}
+            </p>
+            
+            <div class="bundle-items-list">
+                {% for item, qty in bundle.bundle_items.items() %}
+                <div class="bundle-item">
+                    <span>{{ item.item_name }}</span>
+                    <span>x{{ qty }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            
+                <div class="item-actions">
+                    <div class="quantity-selector">
+                        <button class="qty-btn" onclick="decreaseQty(this)">-</button>
+                        <span class="qty-display">1</span>
+                        <button class="qty-btn" onclick="increaseQty(this, {{ bundle.get_stock() }})">+</button>
+                    </div>
+                    <button class="add-to-cart-btn" onclick="addToCart(this)">
+                        Add
+                    </button>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% endif %}

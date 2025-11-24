@@ -1,0 +1,436 @@
+{% extends "base.html" %}
+
+{% block title %}Paiement Réussi - Ub'EJR Eats{% endblock %}
+
+{% block extra_css %}
+<style>
+    .success-container {
+        max-width: 700px;
+        margin: 80px auto;
+        padding: 40px;
+        text-align: center;
+        animation: fadeInScale 0.6s ease-out;
+    }
+
+    @keyframes fadeInScale {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    .success-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border-radius: 25px;
+        padding: 50px 40px;
+        box-shadow: 0 15px 50px rgba(102, 126, 234, 0.2);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .success-icon {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 30px;
+        background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: pulse 2s infinite;
+        box-shadow: 0 8px 30px rgba(132, 250, 176, 0.4);
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+    }
+
+    .success-icon svg {
+        width: 50px;
+        height: 50px;
+        stroke: white;
+        stroke-width: 3;
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .checkmark {
+        animation: drawCheck 0.8s ease-out 0.3s both;
+    }
+
+    @keyframes drawCheck {
+        0% {
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
+        }
+        100% {
+            stroke-dasharray: 100;
+            stroke-dashoffset: 0;
+        }
+    }
+
+    .success-title {
+        font-size: 36px;
+        font-weight: 800;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 15px;
+    }
+
+    .success-message {
+        color: #5a6c7d;
+        font-size: 18px;
+        line-height: 1.8;
+        margin-bottom: 30px;
+    }
+
+    .order-summary {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 30px 0;
+        text-align: left;
+    }
+
+    .order-summary h3 {
+        color: #2c3e50;
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .order-detail {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .order-detail:last-child {
+        border-bottom: none;
+        padding-top: 15px;
+        margin-top: 10px;
+        border-top: 2px solid #e9ecef;
+        font-weight: 700;
+        font-size: 18px;
+    }
+
+    .order-detail-value {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 700;
+    }
+
+    .btn {
+        padding: 14px 32px;
+        border: none;
+        border-radius: 25px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, #a8b8d8 0%, #8b9dc3 100%);
+        color: white;
+        box-shadow: 0 6px 20px rgba(168, 184, 216, 0.3);
+    }
+
+    .btn-secondary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(168, 184, 216, 0.4);
+    }
+
+    .loading-state {
+        padding: 60px 20px;
+    }
+
+    .loading-spinner {
+        width: 60px;
+        height: 60px;
+        border: 5px solid #e9ecef;
+        border-top: 5px solid #667eea;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .error-state {
+        color: #fa709a;
+        padding: 40px 20px;
+    }
+
+    .order-items-list {
+        margin: 20px 0;
+    }
+
+    .order-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px;
+        background: white;
+        border-radius: 12px;
+        margin-bottom: 10px;
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+
+    .order-item:hover {
+        border-color: #c5cae9;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+    }
+
+    .order-item-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #e8f4f8 0%, #d4e9f7 100%);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+
+    .order-item-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 10px;
+    }
+
+    .order-item-icon i {
+        color: #667eea;
+    }
+
+    .order-item-details {
+        flex: 1;
+    }
+
+    .order-item-name {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 4px;
+        font-size: 15px;
+    }
+
+    .order-item-quantity {
+        color: #7f8c8d;
+        font-size: 13px;
+    }
+
+    .order-item-price {
+        font-weight: 700;
+        color: #667eea;
+        font-size: 16px;
+        white-space: nowrap;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="success-container">
+    <div class="success-card">
+        <div id="loading-state" class="loading-state">
+            <div class="loading-spinner"></div>
+            <p style="color: #7f8c8d; font-size: 16px;">Verifying your payment...</p>
+        </div>
+
+        <div id="success-state" style="display: none;">
+            <div class="success-icon">
+                <svg viewBox="0 0 52 52">
+                    <circle cx="26" cy="26" r="25" fill="none"/>
+                    <path class="checkmark" d="M14 27l7.5 7.5L38 18"/>
+                </svg>
+            </div>
+
+            <h1 class="success-title">Payment Successful !</h1>
+            <p class="success-message">
+                Thank you for your order
+            </p>
+
+            <div class="order-summary" id="order-summary">
+                <h3>Your order</h3>
+                <div class="order-detail">
+                    <span>Order id</span>
+                    <span class="order-detail-value" id="order-id">--</span>
+                </div>
+                <div class="order-items-list" id="order-items-list">
+                    <span>Content</span>
+                </div>
+                <div class="order-detail">
+                    <span>Total</span>
+                    <span class="order-detail-value" id="order-total">--€</span>
+                </div>
+            </div>
+            <a href="/menu" class="btn btn-primary">Order something else ?</a>
+        </div>
+
+        <div id="error-state" class="error-state" style="display: none;">
+            <p id="error-message" style="margin-bottom: 30px;">
+                An error occured during the payment
+            </p>
+            <a href="/menu" class="btn btn-primary">Back to menu</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% raw %}
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('session_id');
+    const orderId = urlParams.get('order_id');
+
+    document.addEventListener('DOMContentLoaded', async function() {
+        if (!sessionId) {
+            showError('Aucune session de paiement trouvée');
+            return;
+        }
+
+        await verifyPayment(sessionId);
+    });
+
+    async function verifyPayment(sessionId) {
+        try {
+            const response = await fetch(`/customer/payment/verify-payment?session_id=${sessionId}`, {
+                method: 'GET',
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                const order_infos = await response.json();
+                showSuccess(order_infos);
+            } else {
+                const error = await response.json();
+                showError(error.detail || 'Erreur while confirming payment');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    function showSuccess(order_infos) {
+        document.getElementById('loading-state').style.display = 'none';
+        document.getElementById('success-state').style.display = 'block';
+        document.getElementById('error-state').style.display = 'none';
+        
+        if (order_infos) {
+            order = order_infos.order
+            document.getElementById('order-id').textContent = `#${order_infos.order_id || '--'}`;
+            document.getElementById('order-total').textContent = `${(order_infos.order_price || 0).toFixed(2)}€`;
+        }
+
+        displayOrderItems(order_infos.orderables)
+    }
+
+    function displayOrderItems(orderables) {
+        const container = document.getElementById('order-items-list');
+        
+        if (!orderables || orderables.length === 0) {
+            container.innerHTML = '<p style="text-align: center; color: #95a5a6;">Aucun article</p>';
+            return;
+        }
+
+        let itemsHtml = '';
+        
+        for (const orderable of orderables) {
+            let name = '';
+            let price = 0;
+            let quantity = orderable.quantity;
+            let icon = '';
+            
+            if (orderable.type === 'item') {
+                name = orderable.item_name;
+                price = orderable.item_price;
+                
+                if (orderable.image_url) {
+                    icon = `<img src="${orderable.image_url}" alt="${name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;">`;
+                } else {
+                    if (orderable.item_type === 'Starter') {
+                        icon = '<i class="fa-solid fa-egg"></i>';
+                    } else if (orderable.item_type === 'Main course') {
+                        icon = '<i class="fa-solid fa-burger"></i>';
+                    } else if (orderable.item_type === 'Dessert') {
+                        icon = '<i class="fa-solid fa-cookie"></i>';
+                    } else if (orderable.item_type === 'Drink') {
+                        icon = '<i class="fa-solid fa-beer-mug-empty"></i>';
+                    } else if (orderable.item_type === 'Side dish') {
+                        icon = '<i class="fa-solid fa-bowl-rice"></i>';
+                    } else {
+                        icon = '<i class="fa-solid fa-utensils"></i>';
+                    }
+                }
+                
+            } else if (orderable.type === 'bundle') {
+                name = orderable.bundle_name;
+                price = orderable.bundle_price;
+
+                if (orderable.image_url) {
+                    icon = `<img src="${orderable.image_url}" alt="${name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;">`;
+                } else {
+                    icon = '<i class="fa-solid fa-gift"></i>';
+                }
+            }
+            
+            const subtotal = price * quantity;
+            
+            itemsHtml += `
+                <div class="order-item">
+                    <div class="order-item-icon">
+                        ${icon}
+                    </div>
+                    <div class="order-item-details">
+                        <div class="order-item-name">${name}</div>
+                        <div class="order-item-quantity">${quantity} x ${price.toFixed(2)}€</div>
+                    </div>
+                    <div class="order-item-price">${subtotal.toFixed(2)}€</div>
+                </div>
+            `;
+        }
+        
+        container.innerHTML = itemsHtml;
+    }
+    function showError(message) {
+        document.getElementById('loading-state').style.display = 'none';
+        document.getElementById('success-state').style.display = 'none';
+        document.getElementById('error-state').style.display = 'block';
+    }
+</script>
+{% endraw %}
+{% endblock %}

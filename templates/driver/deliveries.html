@@ -1,0 +1,580 @@
+{% extends "base.html" %}
+
+{% block title %}Livraisons - Ub'EJR Eats{% endblock %}
+
+{% block extra_css %}
+<style>
+    .deliveries-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 24px;
+        animation: fadeIn 0.8s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .page-header h1 {
+        font-size: 42px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 12px;
+    }
+
+    .page-header p {
+        color: #7f8c8d;
+        font-size: 16px;
+    }
+
+    /* Stats cards */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        padding: 25px;
+        border-radius: 15px;
+        text-align: center;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.15);
+    }
+
+    .stat-icon {
+        font-size: 36px;
+        margin-bottom: 10px;
+    }
+
+    .stat-value {
+        font-size: 32px;
+        font-weight: 800;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        font-size: 14px;
+        color: #7f8c8d;
+        font-weight: 500;
+    }
+
+    /* Delivery cards */
+    .deliveries-list {
+        display: grid;
+        gap: 20px;
+    }
+
+    .delivery-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: 2px solid transparent;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .delivery-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+        transition: left 0.6s ease;
+    }
+
+    .delivery-card:hover::before {
+        left: 100%;
+    }
+
+    .delivery-card:hover {
+        transform: translateY(-5px);
+        border-color: #c5cae9;
+        box-shadow: 0 15px 45px rgba(102, 126, 234, 0.15);
+    }
+
+    .delivery-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .delivery-info {
+        flex: 1;
+    }
+
+    .delivery-id {
+        font-size: 20px;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 8px;
+    }
+
+    .delivery-time {
+        color: #7f8c8d;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .delivery-badge {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(132, 250, 176, 0.3);
+    }
+
+    .delivery-address {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 12px;
+        margin-bottom: 15px;
+        border-left: 3px solid #667eea;
+    }
+
+    .address-label {
+        font-size: 12px;
+        color: #7f8c8d;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+    }
+
+    .address-text {
+        color: #2c3e50;
+        font-weight: 500;
+        font-size: 15px;
+    }
+
+    .delivery-items {
+        margin-bottom: 15px;
+    }
+
+    .items-title {
+        font-size: 14px;
+        color: #7f8c8d;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+    .item-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 12px;
+        background: white;
+        border-radius: 8px;
+        margin-bottom: 6px;
+        font-size: 14px;
+    }
+
+    .item-name {
+        color: #2c3e50;
+    }
+
+    .item-quantity {
+        color: #7f8c8d;
+        font-weight: 600;
+    }
+
+    .delivery-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 15px;
+        border-top: 2px solid #e9ecef;
+    }
+
+    .delivery-total {
+        font-size: 18px;
+        font-weight: 700;
+        color: #2c3e50;
+    }
+
+    .total-amount {
+        font-size: 24px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .start-delivery-btn {
+        padding: 12px 28px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .start-delivery-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .start-delivery-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* Empty state */
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+    }
+
+    .empty-icon {
+        font-size: 64px;
+        margin-bottom: 20px;
+        opacity: 0.3;
+    }
+
+    .empty-title {
+        font-size: 24px;
+        color: #2c3e50;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .empty-text {
+        color: #7f8c8d;
+        font-size: 16px;
+    }
+
+    /* Loading state */
+    .loading-state {
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+    .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid #e9ecef;
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .order-items-list {
+        margin: 20px 0;
+    }
+
+    .order-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px;
+        background: white;
+        border-radius: 12px;
+        margin-bottom: 10px;
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+
+    .order-item:hover {
+        border-color: #c5cae9;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+    }
+
+    .order-item-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #e8f4f8 0%, #d4e9f7 100%);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+
+    .order-item-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 10px;
+    }
+
+    .order-item-icon i {
+        color: #667eea;
+    }
+
+    .order-item-details {
+        flex: 1;
+    }
+
+    .order-item-name {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 4px;
+        font-size: 15px;
+    }
+
+    .order-item-quantity {
+        color: #7f8c8d;
+        font-size: 13px;
+    }
+
+    .order-item-price {
+        font-weight: 700;
+        color: #667eea;
+        font-size: 16px;
+        white-space: nowrap;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="deliveries-container">
+    <div class="page-header">
+        <h1>Available deliveries</h1>
+    </div>
+    <div class="deliveries-list" id="deliveries-list">
+        <div class="loading-state">
+            <div class="loading-spinner"></div>
+            <p style="color: #7f8c8d;">Loading of deliveries...</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% raw %}
+<script>
+    document.addEventListener('DOMContentLoaded', async function() {
+        await checkActiveDelivery()
+        await loadDeliveries();
+    });
+
+    async function checkActiveDelivery() {
+        try {
+            const response = await fetch('/drivers/me/current-delivery', {
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                const order_id = await response.json();
+                if (order_id){
+                    window.location.href = `/delivery/${order_id}`;
+                }
+            }
+        } catch (error) {
+            console.error('Error checking active delivery:', error);
+        }
+    }
+
+    async function loadDeliveries() {
+        try {
+            const response = await fetch('/drivers/orders', {
+                credentials: 'include'
+            });
+            if (response.ok) {
+                const orders = await response.json();
+                displayDeliveries(orders);
+            } else {
+                showEmptyState();
+            }
+        } catch (error) {
+            console.error('Erreur:', error);
+            showEmptyState();
+        }
+    }
+
+    function displayDeliveries(orders) {
+        const container = document.getElementById('deliveries-list');
+        let itemsHtml = '';
+        
+        if (!orders || orders.length === 0) {
+            showEmptyState();
+            return;
+        }
+
+        container.innerHTML = orders.map(order => {
+            const orderDate = new Date(order.order_timestamp).toLocaleString('fr-FR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            for (const orderable of order.items) {
+                let name = '';
+                let price = 0;
+                let quantity = orderable.quantity;
+                let icon = '';
+
+                if (orderable.type === 'item') {
+                    name = orderable.item_name;
+                    price = orderable.item_price;
+
+                    if (orderable.image_url) {
+                        icon = `<img src="${orderable.image_url}" alt="${name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;">`;
+                    } else {
+                        if (orderable.item_type === 'Starter') {
+                            icon = '<i class="fa-solid fa-egg"></i>';
+                        } else if (orderable.item_type === 'Main course') {
+                            icon = '<i class="fa-solid fa-burger"></i>';
+                        } else if (orderable.item_type === 'Dessert') {
+                            icon = '<i class="fa-solid fa-cookie"></i>';
+                        } else if (orderable.item_type === 'Drink') {
+                            icon = '<i class="fa-solid fa-beer-mug-empty"></i>';
+                        } else if (orderable.item_type === 'Side dish') {
+                            icon = '<i class="fa-solid fa-bowl-rice"></i>';
+                        } else {
+                            icon = '<i class="fa-solid fa-utensils"></i>';
+                        }
+                    }
+
+                } else if (orderable.type === 'bundle') {
+                    name = orderable.bundle_name;
+                    price = orderable.bundle_price;
+
+                    if (orderable.image_url) {
+                        icon = `<img src="${orderable.image_url}" alt="${name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;">`;
+                    } else {
+                        icon = '<i class="fa-solid fa-gift"></i>';
+                    }
+                }
+
+                const subtotal = price * quantity;
+
+                itemsHtml += `
+                    <div class="order-item">
+                        <div class="order-item-icon">
+                            ${icon}
+                        </div>
+                        <div class="item-row">
+                            <span class="item-name">${name} &nbsp</span>
+                            <span class="item-quantity"> x ${quantity}</span>
+                        </div>
+                        <div class="order-item-price">${subtotal.toFixed(2)}€</div>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="delivery-card">
+                    <div class="delivery-header">
+                        <div class="delivery-info">
+                            <div class="delivery-id">Commande #${order.order_id}</div>
+                            <div class="delivery-time">
+                                <i class="fa-solid fa-clock"></i>
+                                ${orderDate}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="delivery-address">
+                        <div class="address-label">Delivery address</div>
+                        <div class="address-text">
+                            ${order.address}
+                        </div>
+                    </div>
+
+                    <div class="delivery-items">
+                        <div class="items-title">Order contents</div>
+                        ${itemsHtml}
+                    </div>
+
+                    <div class="delivery-footer">
+                        <div class="delivery-total">
+                            Total : <span class="total-amount">${(order.order_price || 0).toFixed(2)}€</span>
+                        </div>
+                        <button class="start-delivery-btn" onclick="startDelivery(${order.order_id})">
+                            Start delivery
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function showEmptyState() {
+        const container = document.getElementById('deliveries-list');
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-title">No deliveries available</div>
+            </div>
+        `;
+    }
+
+    async function startDelivery(orderId) {
+        const btn = event.target;
+        btn.disabled = true;
+
+        try {
+            const response = await fetch(`/drivers/orders/${orderId}/start`, {
+                method: 'PUT',
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                window.location.href = `/delivery/${orderId}`;
+            } else {
+                const error = await response.json();
+                alert('Error: ' + (error.detail || 'Error occured while starting delivery'));
+                btn.disabled = false;
+                btn.textContent = 'Start delivery';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error occured while starting delivery');
+            btn.disabled = false;
+            btn.textContent = 'Start delivery';
+        }
+    }
+</script>
+{% endraw %}
+{% endblock %}

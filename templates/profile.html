@@ -1,0 +1,358 @@
+<div class="profile-section">
+    <div class="section-header">
+        <h2>Personal Informations</h2>
+        <button class="edit-btn" onclick="toggleEdit('profile')">Edit</button>
+    </div>
+    
+    <form id="profile-form" class="profile-form" onsubmit="updateProfile(event)">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="first_name">First Name</label>
+                <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}" disabled>
+            </div>
+            <div class="form-group">
+                <label for="last_name">Last Name</label>
+                <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}" disabled>
+            </div>
+        </div>
+        
+        {% if user_type == 'customer' %}
+        <div class="form-row">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="mail" value="{{ user.customer_mail }}" disabled>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone</label>
+                <input type="tel" id="phone" name="phone" value="{{ user.customer_phone }}" disabled>
+            </div>
+        </div>
+        {% else %}
+        <div class="form-group">
+            <label for="phone">Phone</label>
+            <input type="tel" id="phone" name="phone" value="{{ user.driver_phone }}" disabled>
+        </div>
+        {% endif %}
+        
+        <div class="form-actions">
+            <button type="button" class="btn-secondary" onclick="cancelEdit('profile')">Cancel</button>
+            <button type="submit" class="btn-primary">Save</button>
+        </div>
+    </form>
+</div>
+{% if user_type == 'customer'%}
+<div class="profile-section">
+    <div class="section-header">
+        <h2>Address</h2>
+        <button class="edit-btn" onclick="toggleEdit('address')">Edit</button>
+    </div>
+    
+    <form id="address-form" class="profile-form" onsubmit="updateAddress(event)">
+        <div class="form-group">
+            <label for="address_street">Street</label>
+            <input type="text" id="address_street" name="address_street" value="{{ user.customer_address.address_street }}" disabled>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="address_number">Number</label>
+                <input type="number" id="address_number" name="address_number" value="{{ user.customer_address.address_number }}" disabled>
+            </div>
+            <div class="form-group">
+                <label for="address_postal_code">Postal Code</label>
+                <input type="number" id="address_postal_code" name="address_postal_code" value="{{ user.customer_address.address_postal_code }}" disabled>
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="address_city">City</label>
+                <input type="text" id="address_city" name="address_city" value="{{ user.customer_address.address_city }}" disabled>
+            </div>
+            <div class="form-group">
+                <label for="address_country">Country</label>
+                <input type="text" id="address_country" name="address_country" value="{{ user.customer_address.address_country }}" disabled>
+            </div>
+        </div>
+        
+        <div class="form-actions" style="display: none;">
+            <button type="button" class="btn-secondary" onclick="cancelEdit('address')">Cancel</button>
+            <button type="submit" class="btn-primary">Save</button>
+        </div>
+    </form>
+</div>
+{% endif %}
+<div class="profile-section">
+    <div class="section-header">
+        <h2>Password</h2>
+    </div>
+    
+    <form id="password-form" class="profile-form" onsubmit="updatePassword(event)">
+        <div class="form-group">
+            <label form="current_password">Current password</label>
+            <input type="password" id="current_password" name="current_password" placeholder="Your current password" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="new_password">New password</label>
+            <input type="password" id="new_password" name="new_password" placeholder="At least 6 characters, 1 uppercase later and a special character" minlength="8" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="confirm_password">Confirm new password</label>
+            <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirme your new password" minlength="8" required>
+        </div>
+        
+        <div class="form-actions">
+            <button type="button" class="btn-secondary" onclick="cancelEdit('password')">Cancel</button>
+            <button type="submit" class="btn-primary">Edit password</button>
+        </div>
+    </form>
+</div>
+<div class="profile-section">
+    <div class="section-header">
+        <h2>Delete Account</h2>
+    </div>
+    
+    <form id="delete-form" class="profile-form" onsubmit="deleteAccount(event)">
+        <div class="form-group">
+            <label form="identifier">Identifier</label>
+            <input type="text" id="identifier" name="identifier" placeholder="Your phone number or email" minlength="8" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Passsword</label>
+            <input type="password" id="password" name="password" placeholder="Your password" required>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">Delete Account</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    let originalProfileData = {};
+    let originalAddressData = {};
+
+    function toggleEdit(section) {
+        if (section === 'profile') {
+            const form = document.getElementById('profile-form');
+            const inputs = form.querySelectorAll('input');
+            const actions = form.querySelector('.form-actions');
+            const editBtn = form.previousElementSibling.querySelector('.edit-btn');
+            
+            originalProfileData = {};
+            inputs.forEach(input => {
+                input.disabled = false;
+                originalProfileData[input.name] = input.value;
+            });
+            
+            actions.style.display = 'flex';
+            editBtn.style.display = 'none';
+            
+        } else if (section === 'address') {
+            const form = document.getElementById('address-form');
+            const inputs = form.querySelectorAll('input');
+            const actions = form.querySelector('.form-actions');
+            const editBtn = form.previousElementSibling.querySelector('.edit-btn');
+            
+            originalAddressData = {};
+            inputs.forEach(input => {
+                input.disabled = false;
+                originalAddressData[input.name] = input.value;
+            });
+            
+            actions.style.display = 'flex';
+            editBtn.style.display = 'none';
+        }
+    }
+
+    function cancelEdit(section) {
+        if (section === 'profile') {
+            const form = document.getElementById('profile-form');
+            const inputs = form.querySelectorAll('input');
+            const actions = form.querySelector('.form-actions');
+            const editBtn = form.previousElementSibling.querySelector('.edit-btn');
+            
+            inputs.forEach(input => {
+                input.disabled = true;
+                input.value = originalProfileData[input.name] || '';
+            });
+            
+            actions.style.display = 'none';
+            editBtn.style.display = 'block';
+            
+        } else if (section === 'address') {
+            const form = document.getElementById('address-form');
+            const inputs = form.querySelectorAll('input');
+            const actions = form.querySelector('.form-actions');
+            const editBtn = form.previousElementSibling.querySelector('.edit-btn');
+            
+            inputs.forEach(input => {
+                input.disabled = true;
+                input.value = originalAddressData[input.name];
+            });
+            
+            actions.style.display = 'none';
+            editBtn.style.display = 'block';
+            
+        } else if (section === 'password') {
+            const form = document.getElementById('password-form');
+            const placeholder = document.getElementById('password-placeholder');
+            const editBtn = form.previousElementSibling.querySelector('.edit-btn');
+            
+            form.reset();
+            placeholder.style.display = 'block';
+            editBtn.style.display = 'block';
+        }
+    }
+
+    async function updateProfile(event) {
+        event.preventDefault();
+        
+        const formData = new FormData(event.target);
+        const data = {};
+        
+        const userType = '{{ user_type }}';
+        if (userType === 'customer') {
+            data.customer_first_name = formData.get('first_name');
+            data.customer_last_name = formData.get('last_name');
+            data.customer_mail = formData.get('mail');
+            data.customer_phone = formData.get('phone');
+        } else {
+            data.driver_first_name = formData.get('first_name');
+            data.driver_last_name = formData.get('last_name');
+            data.driver_phone = formData.get('phone');
+        }
+        
+        try {
+            const endpoint = userType === 'customer' ? '/customer/me' : '/drivers/me';
+            const response = await fetch(endpoint, {
+                method: 'PUT',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+            
+            if (response.ok) {
+                alert('Profil successfuly edited');
+                window.location.reload();
+            } else {
+                const error = await response.json();
+                alert('Error: ' + (error.detail || 'Error occured while editing profile'));
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    }
+
+    async function updateAddress(event) {
+        event.preventDefault();
+        
+        const formData = new FormData(event.target);
+        const data = {
+            address_street: formData.get('address_street'),
+            address_number: parseInt(formData.get('address_number')),
+            address_postal_code: parseInt(formData.get('address_postal_code')),
+            address_city: formData.get('address_city'),
+            address_country: formData.get('address_country')
+        };
+        
+        try {
+            const response = await fetch('/customer/address', {
+                method: 'PUT',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+            
+            if (response.ok) {
+                alert('Address successfuly edited');
+                window.location.reload();
+            } else {
+                const error = await response.json();
+                alert('Error: ' + (error.detail || 'Error while updating address'));
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    }
+
+    async function updatePassword(event) {
+        event.preventDefault();
+        
+        const formData = new FormData(event.target);
+        const data = {
+            current_password: formData.get('current_password'),
+            new_password: formData.get('new_password'),
+            confirm_password: formData.get('confirm_password')
+        };
+        
+        try {
+            const response = await fetch('/customer/me/password', {
+                method: 'PUT',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+            
+            if (response.ok) {
+                alert('Password successfuly updated !');
+                cancelEdit('password');
+            } else {
+                const error = await response.json();
+                alert('Error: ' + (error.detail || 'Error while updating password'));
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    }
+    async function deleteAccount(event) {
+        event.preventDefault();
+        
+        const confirmed = confirm(
+            "/!\\ WARNING /!\\ \n\n" +
+            "This action is irreversible and your data will be lost."
+        );
+        
+        if (!confirmed) {
+            return;
+        }
+        
+        const formData = new FormData(event.target);
+        const data = {
+            identifier: formData.get('identifier'),
+            password: formData.get('password')
+        };
+        
+        try {
+            const userType = '{{ user_type }}';
+            const endpoint = userType === 'customer' ? '/customer/delete_account' : '/drivers/delete_account';
+            
+            const response = await fetch(endpoint, {
+                method: 'DELETE',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+            
+            if (response.ok || response.status === 204) {
+                alert('Your account has been deleted');
+                window.location.href = '/logout';
+            } else {
+                const error = await response.json();
+                alert('Error: ' + (error.detail || 'An error occured while deleting your account'));
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    }
+</script>
