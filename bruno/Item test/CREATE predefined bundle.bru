@@ -1,0 +1,29 @@
+meta {
+  name: CREATE predefined bundle
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{BASE_URL}}/items?name=Poke Bowl&price=5&stock=20&availability=true&item_type=main&desc=A cute poke bowl.
+  body: none
+  auth: inherit
+}
+
+params:query {
+  name: Poke Bowl
+  price: 5
+  stock: 20
+  availability: true
+  item_type: main
+  desc: A cute poke bowl.
+}
+
+assert {
+  res.body.message: eq Item created successfully
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,27 @@
+meta {
+  name: Authentification
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{BASE_URL}}/auth?username=groupe8&password=adminpass321
+  body: none
+  auth: none
+}
+
+params:query {
+  username: groupe8
+  password: adminpass321
+}
+
+script:post-response {
+  const response = res.getBody();
+  bru.setEnvVar("AUTH_TOKEN", response.access_token);
+  
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

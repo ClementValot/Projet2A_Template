@@ -1,0 +1,28 @@
+meta {
+  name: CREATE predefined bundle
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{BASE_URL}}/bundles/predefined?name=2 salads&price=13 &item_ids=4&item_ids=5&description=2 lovely salads at a reduced price
+  body: none
+  auth: inherit
+}
+
+params:query {
+  name: 2 salads
+  price: 13 
+  item_ids: 4
+  item_ids: 5
+  description: 2 lovely salads at a reduced price
+}
+
+assert {
+  res.body.message: eq Predefined bundle created
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,24 @@
+meta {
+  name: Update item 3
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{BASE_URL}}/items/11?price=2
+  body: none
+  auth: inherit
+}
+
+params:query {
+  price: 2
+}
+
+assert {
+  res.body.message: eq Item updated successfully
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

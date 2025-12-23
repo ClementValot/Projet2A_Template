@@ -1,0 +1,24 @@
+meta {
+  name: Delete bundle 2
+  type: http
+  seq: 3
+}
+
+delete {
+  url: {{BASE_URL}}/bundles/2
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{AUTH_TOKEN}}
+}
+
+assert {
+  res.body.message: eq Bundle 2 deleted successfully
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

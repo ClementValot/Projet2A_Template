@@ -131,3 +131,6 @@ dmypy.json
 
 # Ruff stuff
 .ruff_cache
+
+#Bruno settings
+bruno/environments/*.bru

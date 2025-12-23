@@ -1,0 +1,24 @@
+meta {
+  name: Update bundle 3
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{BASE_URL}}/bundles/discounted/3?name=Couple menu
+  body: none
+  auth: inherit
+}
+
+params:query {
+  name: Couple menu
+}
+
+assert {
+  res.body.message: eq Discounted bundle 3 updated successfully
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

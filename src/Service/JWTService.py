@@ -23,7 +23,7 @@ class JwtService:
         """
         Creates a token with a 10 minutes expiry time
         """
-        payload = {"user_id": user_id, "expiry_timestamp": time.time() + 600}
+        payload = {"user_id": user_id, "expiry_timestamp": time.time() + 1800}
         token = jwt.encode(payload, self.secret, algorithm=self.algorithm)
 
         return JWTResponse(access_token=token)

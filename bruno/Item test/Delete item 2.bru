@@ -1,0 +1,20 @@
+meta {
+  name: Delete item 2
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{BASE_URL}}/items/2
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.body.message: eq Item 2 deleted successfully
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

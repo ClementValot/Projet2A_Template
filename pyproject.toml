@@ -12,6 +12,10 @@ dependencies = [
     "PyJWT>=2.10.1",
     "psycopg2-binary>=2.9.10",
     "python-dotenv>=1.1.1",
+    "requests>=2.32.5",
+    "phonenumbers>=9.0.18",
+    "python-multipart>=0.0.20",
+    "Faker>=38.0.0",
 ]
 requires-python = "==3.12.*"
 readme = "README.md"
@@ -19,28 +23,35 @@ license = {text = "MIT"}
 
 [tool.pytest.ini_options]
 addopts = "-ra -q"
-pythonpath = [ "."] 
-testpaths = [
-    "tests",
-]
+pythonpath = ["."] 
+testpaths = ["tests"]
 
 
 [tool.pdm]
 distribution = false
 
+[tool.pdm.build]
+includes = ["src"]
+source-includes = ["src"]
+package-dir = {""= "src"}
 
 [tool.pdm.scripts]
 lint = "ruff check"
 format = "ruff format"
 test = "pytest tests --cov=src"
 start = "pdm run __main__.py"
+reset = "pdm run python -m src.utils.reset_database"
+reset_test = "pdm run python -m src.utils.reset_database_test"
 typecheck = "pyrefly check"
+CLI = "pdm run python -m src.CLI"
+bigdata = "pdm run python -m src.utils.bigdata"
 
 [tool.ruff]
 line-length = 120
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "B", "I", "A", "C90", "PERF", "TCH", "TID"]
+ignore = ["B008"]
 
 [tool.pyrefly]
 project-includes = ["src/**/*"]
@@ -62,4 +73,7 @@ typing = [
     "types-requests>=2.32.4.20250809",
     "types-psycopg2>=2.9.21.20250809",
     "pyrefly>=0.30.0",
+]
+dev = [
+    "pytest-mock>=3.15.1",
 ]
