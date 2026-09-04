@@ -1,19 +1,19 @@
 [project]
-name = "Projet2A_2024"
+name = "Projet2A_2026"
 version = "0.1.0"
 description = "Teacher's version of the Projet2A 2024"
 authors = [
     {name = "ClémentValot", email = "clement.valot.pro@gmail.com"},
 ]
 dependencies = [
-    "fastapi>=0.116.1",
-    "uvicorn>=0.35.0",
-    "pydantic>=2.11.7",
-    "PyJWT>=2.10.1",
-    "psycopg2-binary>=2.9.10",
-    "python-dotenv>=1.1.1",
+    "fastapi>=0.141.1",
+    "uvicorn>=0.52.4",
+    "pydantic>=2.13.5",
+    "PyJWT>=2.13.0",
+    "psycopg2-binary>=2.9.12",
+    "python-dotenv>=1.2.3",
 ]
-requires-python = "==3.12.*"
+requires-python = "==3.14.*"
 readme = "README.md"
 license = {text = "MIT"}
 
@@ -51,15 +51,15 @@ search_path = [
 
 [dependency-groups]
 test = [
-    "pytest>=8.4.1",
-    "pytest-cov>=5.0.0",
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
     "freezegun>=1.5.5",
 ]
 lint = [
-    "ruff>=0.12.11",
+    "ruff>=0.16.6",
 ]
 typing = [
-    "types-requests>=2.32.4.20250809",
-    "types-psycopg2>=2.9.21.20250809",
-    "pyrefly>=0.30.0",
+    "types-requests>=2.33.0.20260712",
+    "types-psycopg2>=2.9.21.20260724",
+    "pyrefly>=1.2.0",
 ]
