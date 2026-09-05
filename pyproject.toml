@@ -44,7 +44,7 @@ select = ["E", "F", "W", "B", "I", "A", "C90", "PERF", "TCH", "TID"]
 
 [tool.pyrefly]
 project-includes = ["src/**/*"]
-project-excludes = ['**/*venv/**\*']
+project-excludes = ['.venv/**/*']
 search_path = [
     "."
 ]
